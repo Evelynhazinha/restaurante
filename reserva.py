@@ -16,8 +16,6 @@ class Reserva:
         print("=" * 30)
         print("Reserva confirmada!")
 
-
-# ---- teste isolado ----
 if __name__ == "__main__":
     cliente = input("Nome do cliente: ")
     pessoas = int(input("Quantidade de pessoas: "))

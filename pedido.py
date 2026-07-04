@@ -1,3 +1,5 @@
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from database import Database
 
 class Pedido:
@@ -8,13 +10,12 @@ class Pedido:
         self.total = 0
 
     def mostrar_cardapio(self):
-
         conn = Database.get_connection()
-
         if not conn:
             return []
 
-        cursor = conn.cursor(dictionary=True)
+        # Cursor alterado para RealDictCursor
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
 
         cursor.execute("""
             SELECT idcardapio, nomeprato, preco
@@ -31,31 +32,22 @@ class Pedido:
             print(f"{prato['idcardapio']} - {prato['nomeprato']} - R$ {prato['preco']:.2f}")
 
         Database.close_connection(conn, cursor)
-
         return cardapio
 
-
     def fazer_pedido(self):
-
         cardapio = self.mostrar_cardapio()
 
         while True:
-
             codigo = input("\nCódigo do prato (0 para finalizar): ")
 
             if codigo == "0":
                 break
 
             encontrou = False
-
             for prato in cardapio:
-
                 if str(prato["idcardapio"]) == codigo:
-
                     quantidade = int(input("Quantidade: "))
-
                     subtotal = prato["preco"] * quantidade
-
                     self.total += subtotal
 
                     print(f"{quantidade}x {prato['nomeprato']} adicionados!")
@@ -69,21 +61,18 @@ class Pedido:
 
         print("\nTotal do pedido: R$ {:.2f}".format(self.total))
 
-
     def salvar_pedido(self):
-
         conn = Database.get_connection()
-
         if not conn:
             return
 
         cursor = conn.cursor()
-
         mesa = int(input("Número da mesa: "))
 
+        # Substituído lastrowid pela cláusula RETURNING idpedido
         cursor.execute("""
-            INSERT INTO pedido(total,idcliente,mesa,status)
-            VALUES(%s,%s,%s,%s)
+            INSERT INTO pedido(total, idcliente, mesa, status)
+            VALUES(%s, %s, %s, %s) RETURNING idpedido
         """, (
             self.total,
             self.idcliente,
@@ -93,7 +82,8 @@ class Pedido:
 
         conn.commit()
 
-        self.idpedido = cursor.lastrowid
+        # Resgata o ID gerado pelo banco de dados
+        self.idpedido = cursor.fetchone()[0]
 
         Database.close_connection(conn, cursor)
 

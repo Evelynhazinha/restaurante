@@ -1,6 +1,10 @@
 from auth import AuthService
+from database import Database
 
 def menu():
+    # Inicializa o banco de dados automaticamente ao abrir o sistema
+    print("Iniciando sistema e configurando banco de dados...")
+    Database.inicializar_banco()
 
     while True:
 

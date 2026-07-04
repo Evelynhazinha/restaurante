@@ -1,7 +1,8 @@
 import hashlib
 import getpass
-
-import mysql
+import psycopg2
+from psycopg2.errors import UniqueViolation
+from psycopg2.extras import RealDictCursor
 from database import Database
 
 class User:
@@ -70,11 +71,12 @@ class AuthService:
             print(f"\n✅ Usuário '{nome}' cadastrado como {tipo.upper()} com sucesso!")
             return True
             
-        except mysql.connector.Error as e:
-            if e.errno == 1062:
-                print("❌ Este email já está cadastrado!")
-            else:
-                print(f"❌ Erro ao cadastrar: {e}")
+        except UniqueViolation:
+            # Captura erro de e-mail duplicado no PostgreSQL
+            print("❌ Este email já está cadastrado!")
+            return False
+        except psycopg2.Error as e:
+            print(f"❌ Erro ao cadastrar: {e}")
             return False
         finally:
             Database.close_connection(conn, cursor)
@@ -94,7 +96,8 @@ class AuthService:
             return None
 
         try:
-            cursor = conn.cursor(dictionary=True)
+            # Substituído 'dictionary=True' por cursor_factory do psycopg2
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
             sql = """
                 SELECT id, nome, email, tipo, data_cadastro 
                 FROM usuarios 
@@ -127,7 +130,8 @@ class AuthService:
             return
 
         try:
-            cursor = conn.cursor(dictionary=True)
+            # Substituído 'dictionary=True' por cursor_factory do psycopg2
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
             cursor.execute("""
                 SELECT id, nome, email, tipo, data_cadastro 
                 FROM usuarios 
