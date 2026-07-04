@@ -1,0 +1,126 @@
+DROP DATABASE IF EXISTS restaurante;
+CREATE DATABASE IF NOT EXISTS restaurante;
+USE restaurante;
+
+-- Tabela: cliente
+CREATE TABLE cliente (
+    idcliente INT NOT NULL AUTO_INCREMENT,
+    nomecliente VARCHAR(100),
+    telefone VARCHAR(20),
+    email VARCHAR(100),
+    PRIMARY KEY (idcliente)
+);
+
+-- Tabela: login
+CREATE TABLE login (
+    idlogin INT NOT NULL AUTO_INCREMENT,
+    email VARCHAR(100),
+    senha VARCHAR(255),
+    idcliente INT,
+    PRIMARY KEY (idlogin),
+    CONSTRAINT fk_login_cliente FOREIGN KEY (idcliente) REFERENCES cliente(idcliente)
+);
+
+-- Tabela: funcionario
+CREATE TABLE funcionario (
+    idfuncionario INT NOT NULL AUTO_INCREMENT,
+    nomefuncionario VARCHAR(100),
+    cpf VARCHAR(14),
+    telefone VARCHAR(20),
+    email VARCHAR(100),
+    PRIMARY KEY (idfuncionario)
+);
+
+-- Tabela: reserva
+CREATE TABLE reserva (
+    idreserva INT NOT NULL AUTO_INCREMENT,
+    datahora DATETIME,
+    qtdpessoas INT,
+    idCliente INT,
+    PRIMARY KEY (idreserva),
+    CONSTRAINT fk_reserva_cliente FOREIGN KEY (idCliente) REFERENCES cliente(idcliente)
+);
+
+-- Tabela: pedido
+CREATE TABLE pedido (
+    idpedido INT NOT NULL AUTO_INCREMENT,
+    total FLOAT,
+    idcliente INT,
+    mesa INT,
+    status BOOLEAN,
+    PRIMARY KEY (idpedido),
+    CONSTRAINT fk_pedido_cliente FOREIGN KEY (idcliente) REFERENCES cliente(idcliente)
+);
+
+-- Tabela: cardapio
+CREATE TABLE cardapio (
+    idcardapio INT NOT NULL AUTO_INCREMENT,
+    nomeprato VARCHAR(100),
+    preco FLOAT,
+    idpedido INT,
+    PRIMARY KEY (idcardapio),
+    CONSTRAINT fk_cardapio_pedido FOREIGN KEY (idpedido) REFERENCES pedido(idpedido)
+);
+
+-- Tabela: pagamento
+CREATE TABLE pagamento (
+    idpagamento INT NOT NULL AUTO_INCREMENT,
+    idpedido INT,
+    valor FLOAT,
+    PRIMARY KEY (idpagamento),
+    CONSTRAINT fk_pagamento_pedido FOREIGN KEY (idpedido) REFERENCES pedido(idpedido)
+);
+
+-- Tabela: formapagamento
+CREATE TABLE formapagamento (
+    idformapagamento INT NOT NULL AUTO_INCREMENT,
+    metodo VARCHAR(50),
+    idpagamento INT,
+    PRIMARY KEY (idformapagamento),
+    CONSTRAINT fk_formapagamento_pagamento FOREIGN KEY (idpagamento) REFERENCES pagamento(idpagamento)
+);
+
+ALTER TABLE login ADD COLUMN idfuncionario INT NULL,
+    ADD CONSTRAINT fk_login_funcionario FOREIGN KEY (idfuncionario) REFERENCES funcionario(idfuncionario);
+    
+-- Funcionários
+INSERT INTO funcionario (nomefuncionario, cpf, telefone, email) VALUES
+('João Silva', '569.249.267-11', '(27) 99569-7456', 'joao@restaurante.com'),
+('Maria Souza', '268.225.156-67', '(27) 99235-6598', 'maria@restaurante.com'),
+('Carlos Oliveira', '198.135.983-66', '(27) 99357-1259', 'carlos@restaurante.com'),
+('Ana Pereira', '234.852.987-22', '(27) 98569-7534', 'ana@restaurante.com'),
+('Jorge Silva dos Santos', '159.753.853-69', '(27) 99733-1289', 'jorge@restaurante.com');
+
+-- Logins dos funcionários
+INSERT INTO login (email, senha, idfuncionario) VALUES
+('joao@restaurante.com', 'joaozinho123', 1),
+('maria@restaurante.com', 'Xfo-i136', 2),
+('carlos@restaurante.com', '123456', 3),
+('ana@restaurante.com', 'jjko9086', 4),
+('jorge@restaurante.com', 'jorge134@', 5);
+
+-- Formas de pagamento
+INSERT INTO formapagamento (metodo) VALUES
+('Dinheiro'),
+('Cartão de Débito'),
+('Cartão de Crédito'),
+('PIX'),
+('Vale Alimentação');
+
+LOCK TABLES cardapio WRITE;
+/*!40000 ALTER TABLE cardapio DISABLE KEYS */;
+
+INSERT INTO cardapio VALUES (NULL, 'Risotto', 34.90, NULL),
+ (NULL, 'Lasanha à Bolonhesa', 29.90, NULL),
+ (NULL, 'Espaguete à Carbonara', 32.90, NULL),
+ (NULL, 'Bife Wellington', 35.90, NULL),
+ (NULL, 'Feijoada', 34.90, NULL),
+ (NULL, 'Batatas Fritas', 19.90, NULL),
+ (NULL, 'Mandiocas Fritas', 21.90, NULL),
+ (NULL, 'Petit Gateau com Sorvete', 22.90, NULL),
+ (NULL, 'Gelato', 23.90, NULL),
+ (NULL, 'Sucos Naturais', 7.90, NULL);
+
+/*!40000 ALTER TABLE cardapio ENABLE KEYS */;
+UNLOCK TABLES;
+
