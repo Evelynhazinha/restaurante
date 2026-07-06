@@ -1,3 +1,4 @@
+import getpass
 import hashlib
 import mysql.connector
 from database import Database
@@ -103,8 +104,7 @@ class AuthService:
         print("=" * 60)
 
         email = input("Email: ").strip().lower()
-        senha = input("Senha: ")
-        #senha = getpass.getpass("Senha: ")
+        senha = getpass.getpass("Senha: ")
 
         conn = Database.get_connection()
 

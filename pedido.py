@@ -1,5 +1,4 @@
-import psycopg2
-from psycopg2.extras import RealDictCursor
+import mysql.connector
 from database import Database
 
 class Pedido:
@@ -14,8 +13,7 @@ class Pedido:
         if not conn:
             return []
 
-        # Cursor alterado para RealDictCursor
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor = conn.cursor(dictionary=True)
 
         cursor.execute("""
             SELECT idcardapio, nomeprato, preco
@@ -69,10 +67,9 @@ class Pedido:
         cursor = conn.cursor()
         mesa = int(input("Número da mesa: "))
 
-        # Substituído lastrowid pela cláusula RETURNING idpedido
         cursor.execute("""
             INSERT INTO pedido(total, idcliente, mesa, status)
-            VALUES(%s, %s, %s, %s) RETURNING idpedido
+            VALUES(%s, %s, %s, %s)
         """, (
             self.total,
             self.idcliente,
@@ -82,8 +79,7 @@ class Pedido:
 
         conn.commit()
 
-        # Resgata o ID gerado pelo banco de dados
-        self.idpedido = cursor.fetchone()[0]
+        self.idpedido = cursor.lastrowid
 
         Database.close_connection(conn, cursor)
 
