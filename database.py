@@ -10,7 +10,7 @@ class Database:
                 host="127.0.0.1",
                 user="root",
                 password="",  # coloque sua senha do MySQL aqui
-                database=""  # nome do seu banco
+                database=""  # nome do seu banco de dados
             )
             return conn
 
