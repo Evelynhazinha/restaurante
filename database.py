@@ -1,29 +1,29 @@
-import site
-
 import mysql.connector
-import os
-from dotenv import load_dotenv
 
-load_dotenv() [site: 2]
 
 class Database:
+
     @staticmethod
     def get_connection():
         try:
-            
-            return mysql.connector.connect(
-                host=os.getenv("DB_HOST", "localhost"),
-                user=os.getenv("DB_USER", "root"),
-                password=os.getenv("DB_PASSWORD", ""), 
-                database=os.getenv("DB_NAME", "restaurante")
+            conn = mysql.connector.connect(
+                host="127.0.0.1",
+                user="root",
+                password="",  # coloque sua senha do MySQL aqui
+                database=""  # nome do seu banco
             )
-        except mysql.connector.Error as e:
-            print(f"❌ Erro de conexão com o banco: {e}")
+            return conn
+
+        except mysql.connector.Error as err:
+            print(f"Erro ao conectar com o banco de dados: {err}")
             return None
 
     @staticmethod
-    def close_connection(conn, cursor=None):
-        if cursor:
-            cursor.close()
-        if conn and conn.is_connected():
-            conn.close()
+    def close_connection(conn, cursor):
+        try:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+        except Exception as e:
+            print(f"Erro ao fechar conexão: {e}")
