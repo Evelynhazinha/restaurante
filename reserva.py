@@ -7,6 +7,17 @@ class Reserva:
         self.datahora = datahora
 
     def confirmar(self):
+        conn = Database.get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "INSERT INTO reserva (datahora, qtdpessoas, idCliente) VALUES (%s, %s, %s)",
+            (self.datahora, self.qtdpessoas, self.idcliente)
+        )
+
+        conn.commit()
+        Database.close_connection(conn, cursor)
+
         print("=" * 30)
         print("   RESERVA")
         print("=" * 30)
@@ -17,9 +28,9 @@ class Reserva:
         print("Reserva confirmada!")
 
 if __name__ == "__main__":
-    cliente = input("Nome do cliente: ")
+    cliente = int(input("ID do cliente: "))
     pessoas = int(input("Quantidade de pessoas: "))
-    datahora = input("Data e hora (ex: 25/12 19:00): ")
+    datahora = input("Data e hora (ex: 2026-07-10 19:00:00): ")
 
     reserva = Reserva(idcliente=cliente, qtdpessoas=pessoas, datahora=datahora)
     reserva.confirmar()
