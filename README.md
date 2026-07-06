@@ -9,7 +9,6 @@ O sistema permite que clientes realizem cadastro e login, façam pedidos, escolh
 O projeto foi desenvolvido aplicando conceitos fundamentais de POO, como:
 
 * Classes e Objetos;
-* Encapsulamento;
 * Modularização;
 * Separação de responsabilidades;
 * Integração com banco de dados MySQL.
